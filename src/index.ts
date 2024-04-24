@@ -12,27 +12,6 @@ export type { SliceBoundSelectors } from "./types";
 
 const id = <T>(x: T) => x;
 
-/**
- * A wrapper over `useReducer` that keeps an up to date reference to the state.
- *
- * This allows thunks to receive the newest state when they call `getState()`.
- */
-function useRefReducer<State>(
-  reducer: Reducer<State, UnknownAction>,
-  initialState: State,
-  initialActions: Array<UnknownAction> = [],
-) {
-  const ref = useRef(initialState);
-  const refReducer: typeof reducer = (state, action) =>
-    (ref.current = reducer(state, action));
-  const [state, dispatch] = useReducer(
-    refReducer,
-    ref.current,
-    (initialState) => initialActions.reduce(refReducer, initialState),
-  );
-  return [state, dispatch, ref] as const;
-}
-
 export function useSlice<
   State,
   Actions extends SliceActions,
@@ -40,18 +19,18 @@ export function useSlice<
 >(
   slice: Slice<State, Actions, Selectors>,
   initialState?: State,
-  initialActions?: Array<UnknownAction>,
+  initialActions: Array<UnknownAction> = [],
 ): [
   state: State,
   dispatch: Dispatch & Actions,
   selectors: BoundSelectors<State, Selectors>,
 ] {
-  const [state, reactDispatch, stateRef] = useRefReducer(
+  const [state, reactDispatch] = useReducer(
     slice.reducer,
     typeof initialState === "undefined"
       ? slice.getInitialState()
       : initialState,
-    initialActions,
+    (initialState) => initialActions.reduce(slice.reducer, initialState),
   );
 
   const dispatch = useMemo(() => {
