@@ -21,9 +21,9 @@ export function useSlice<
   initialState?: State,
   initialActions: Array<UnknownAction> = [],
 ): [
-  state: State,
-  dispatch: Dispatch & Actions,
   selectors: BoundSelectors<State, Selectors>,
+  dispatch: Dispatch & Actions,
+  state: State,
 ] {
   const [state, reactDispatch] = useReducer(
     slice.reducer,
@@ -48,5 +48,5 @@ export function useSlice<
     return result as any;
   }, [slice.getSelectors, state]);
 
-  return [state, dispatch, boundSelectors];
+  return [boundSelectors, dispatch, state];
 }

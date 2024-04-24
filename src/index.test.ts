@@ -52,7 +52,7 @@ export const { selectAll, selectEntities, selectIds, selectTotal, selectById } =
 describe("useSlice", () => {
   it("should return slice's initial state, bound actions, and selectors", () => {
     const { result } = renderHook(() => useSlice(todoSlice));
-    const [state, dispatch, selectors] = result.current;
+    const [selectors, dispatch, state] = result.current;
 
     expect(state).toEqual(todoSlice.getInitialState());
 
@@ -73,7 +73,7 @@ describe("useSlice", () => {
     ]);
     const { result } = renderHook(() => useSlice(todoSlice, initialState));
 
-    const [state] = result.current;
+    const [, , state] = result.current;
 
     expect(state).toEqual(initialState);
   });
@@ -84,7 +84,7 @@ describe("useSlice", () => {
       useSlice(todoSlice, undefined, [action]),
     );
 
-    const [state] = result.current;
+    const [, , state] = result.current;
 
     expect(state).toEqual(
       todoAdapter.getInitialState(undefined, [action.payload]),
@@ -95,7 +95,7 @@ describe("useSlice", () => {
     const { result } = renderHook(() => useSlice(todoSlice));
 
     const [, dispatch] = result.current;
-    const getSelectors = () => result.current[2];
+    const getSelectors = () => result.current[0];
 
     expect(getSelectors().selectAll()).toEqual([]);
 
@@ -141,7 +141,7 @@ describe("useSlice", () => {
       }),
     );
 
-    const [state, dispatch, selectors] = result.current;
+    const [selectors, dispatch, state] = result.current;
 
     expect(state).toEqual(initialState);
 

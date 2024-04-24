@@ -22,7 +22,7 @@ const TodoItem = ({ todo, onDelete }: TodoItemProps) => (
 );
 
 const Todos = () => {
-  const [, dispatch, selectors] = useSlice(todoSlice);
+  const [selectors, dispatch] = useSlice(todoSlice);
 
   return (
     <div>
