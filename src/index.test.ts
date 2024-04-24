@@ -53,6 +53,17 @@ const todoSlice = createAppSlice({
   },
 });
 
+export const { todoAdded, todoDeleted, fetchTodo } = todoSlice.actions;
+
+export const {
+  selectLoading,
+  selectAll,
+  selectEntities,
+  selectIds,
+  selectTotal,
+  selectById,
+} = todoSlice.getSelectors();
+
 describe("useSlice", () => {
   it("should return slice's initial state, bound actions, and selectors", () => {
     const { result } = renderHook(() => useSlice(todoSlice));
@@ -125,38 +136,29 @@ describe("useSlice", () => {
     ]);
   });
   it("should support dispatching arbitrary thunks, which can retrieve updated state", () => {
-    const { result } = renderHook(() =>
-      useSlice({
-        reducer: todoSlice.reducer,
-        getInitialState: todoSlice.getInitialState,
-        actions: todoSlice.actions,
-        getSelectors: todoSlice.getSelectors,
-      }),
-    );
+    const { result } = renderHook(() => useSlice(todoSlice));
 
     const [, dispatch] = result.current;
 
-    let thunkRan = false;
-
-    dispatch((dispatch, getState) => {
-      thunkRan = true;
-
-      expect(getState().ids).toHaveLength(0);
+    const thunkRan = dispatch((dispatch, getState) => {
+      expect(selectTotal(getState())).toBe(0);
 
       let id = "";
       act(() => {
         ({
           payload: { id },
-        } = dispatch(todoSlice.actions.todoAdded("Todo 1")));
+        } = dispatch(todoAdded("Todo 1")));
       });
 
-      expect(getState().ids).toHaveLength(1);
+      expect(selectTotal(getState())).toBe(1);
 
       act(() => {
-        dispatch(todoSlice.actions.todoDeleted(id));
+        dispatch(todoDeleted(id));
       });
 
-      expect(getState().ids).toHaveLength(0);
+      expect(selectTotal(getState())).toBe(0);
+
+      return true;
     });
 
     expect(thunkRan).toBe(true);
