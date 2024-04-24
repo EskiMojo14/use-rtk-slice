@@ -39,9 +39,10 @@ export function useSlice<
   }, [slice.actions]);
 
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
-    const selectors = slice.getSelectors(id);
     const result: Record<string, Selector> = {};
-    for (const [key, selector] of Object.entries<Selector>(selectors)) {
+    for (const [key, selector] of Object.entries<Selector>(
+      slice.getSelectors(id),
+    )) {
       result[key] = selector.bind(null, state);
     }
     return result as any;
