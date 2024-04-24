@@ -87,15 +87,16 @@ describe("useSlice", () => {
   it("should update state when actions are called", async () => {
     const { result } = renderHook(() => useSlice(todoSlice));
 
-    const [, dispatch, selectors] = result.current;
+    const [, dispatch] = result.current;
+    const getSelectors = () => result.current[2];
 
-    expect(selectors.selectAll()).toEqual([]);
+    expect(getSelectors().selectAll()).toEqual([]);
 
     const {
       payload: { id },
     } = await act(() => dispatch.todoAdded("Todo 1"));
 
-    expect(selectors.selectAll()).toEqual([
+    expect(getSelectors().selectAll()).toEqual([
       { id, text: "Todo 1", completed: false },
     ]);
 
@@ -103,15 +104,16 @@ describe("useSlice", () => {
       dispatch.todoDeleted(id);
     });
 
-    expect(selectors.selectAll()).toEqual([]);
+    expect(getSelectors().selectAll()).toEqual([]);
   });
   it("should support bound thunks", async () => {
     const { result } = renderHook(() => useSlice(todoSlice));
 
-    const [, dispatch, selectors] = result.current;
+    const [, dispatch] = result.current;
+    const getSelectors = () => result.current[2];
 
-    expect(selectors.selectLoading()).toBe(false);
-    expect(selectors.selectAll()).toEqual([]);
+    expect(getSelectors().selectLoading()).toBe(false);
+    expect(getSelectors().selectAll()).toEqual([]);
 
     let promise = undefined as
       | ReturnType<typeof dispatch.fetchTodo>
@@ -121,14 +123,14 @@ describe("useSlice", () => {
       promise = dispatch.fetchTodo();
     });
 
-    expect(selectors.selectLoading()).toBe(true);
+    expect(getSelectors().selectLoading()).toBe(true);
 
     await act(async () => {
       await promise;
     });
 
-    expect(selectors.selectLoading()).toBe(false);
-    expect(selectors.selectAll()).toEqual([
+    expect(getSelectors().selectLoading()).toBe(false);
+    expect(getSelectors().selectAll()).toEqual([
       { id: promise!.requestId, text: "Todo", completed: false },
     ]);
   });

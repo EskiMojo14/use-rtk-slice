@@ -95,11 +95,11 @@ export function useSlice<
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
     const selectors = slice.getSelectors();
     const result: Record<string, Selector> = {};
-    for (const [key, selector] of Object.entries(selectors)) {
-      result[key] = (...args) => selector(stateRef.current, ...args);
+    for (const [key, selector] of Object.entries<Selector>(selectors)) {
+      result[key] = selector.bind(null, state);
     }
     return result as any;
-  }, [slice.getSelectors]);
+  }, [slice.getSelectors, state]);
 
   return [state, thunkDispatch, boundSelectors];
 }
