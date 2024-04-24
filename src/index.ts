@@ -40,7 +40,7 @@ type BoundSelectors<State, Selectors extends SliceSelectors<any>> = Compute<{
 type BivariantSelector<S extends Selector> =
   S extends Selector<infer State, infer Result, infer Args>
     ? {
-        "bivarianceHack"(state: State, ...args: Args): Result;
+        bivarianceHack(state: State, ...args: Args): Result;
       }["bivarianceHack"]
     : never;
 
