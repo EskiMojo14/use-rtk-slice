@@ -1,9 +1,8 @@
-import { useMemo, useReducer, useRef } from "react";
+import { useMemo, useReducer, Reducer, useRef } from "react";
 import type {
   ThunkAction,
   UnknownAction,
   Selector,
-  Reducer,
   ThunkDispatch,
 } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -45,7 +44,7 @@ interface Slice<
   Selectors extends SliceSelectors<State>,
 > {
   getInitialState: () => State;
-  reducer: (state: State, action: UnknownAction) => State; // unlike the Redux version of Reducer, this one will never be called with undefined
+  reducer: Reducer<State, UnknownAction>;
   actions: Actions;
   getSelectors(arg: (state: NoInfer<State>) => NoInfer<State>): Selectors;
 }
