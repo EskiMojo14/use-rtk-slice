@@ -25,9 +25,11 @@ export interface Todo {
 
 const todoAdapter = createEntityAdapter<Todo>();
 
+const initialState = todoAdapter.getInitialState({ loading: false });
+
 export const todoSlice = createAppSlice({
   name: "todos",
-  initialState: todoAdapter.getInitialState({ loading: false }),
+  initialState,
   reducers: (create) => ({
     todoAdded: create.preparedReducer(
       (text: string) => ({ payload: { id: nanoid(), text, completed: false } }),
@@ -35,9 +37,16 @@ export const todoSlice = createAppSlice({
     ),
     todoDeleted: create.reducer(todoAdapter.removeOne),
     fetchTodo: create.asyncThunk<Todo, void>(
-      async (_, { requestId }) => {
+      async (_, { requestId, getState }) => {
         await wait(250);
-        return { id: requestId, text: "Todo", completed: false };
+        const currentLength: number = selectTotal(
+          getState() as typeof initialState,
+        );
+        return {
+          id: requestId,
+          text: `Todo ${currentLength + 1}`,
+          completed: false,
+        };
       },
       {
         pending(state) {
@@ -158,7 +167,7 @@ describe("useSlice", () => {
 
     expect(getSelectors().selectLoading()).toBe(false);
     expect(getSelectors().selectAll()).toEqual([
-      { id: promise!.requestId, text: "Todo", completed: false },
+      { id: promise!.requestId, text: "Todo 1", completed: false },
     ]);
   });
   it("should support dispatching arbitrary thunks, which can retrieve updated state", async () => {
