@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { useSlice, type SliceBoundActions, type SliceBoundSelectors } from ".";
+import { useSlice } from ".";
 import { Todo, todoSlice } from "./index.test";
 import { render, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -24,10 +24,8 @@ const TodoItem = ({ todo, onDelete }: TodoItemProps) => (
 const Todos = () => {
   const [, dispatch, selectors] = useSlice(todoSlice);
 
-  const loading = selectors.selectLoading();
   return (
     <div>
-      {loading && <p>Loading...</p>}
       {selectors.selectTotal() ? (
         <ul>
           {selectors.selectIds().map((id) => {
@@ -45,8 +43,12 @@ const Todos = () => {
       ) : (
         <p>No todos</p>
       )}
-      <button disabled={loading} onClick={() => dispatch.fetchTodo()}>
-        Fetch a Todo
+      <button
+        onClick={() =>
+          dispatch.todoAdded(`Todo ${selectors.selectTotal() + 1}`)
+        }
+      >
+        Add a Todo
       </button>
     </div>
   );
@@ -59,20 +61,18 @@ describe("Todos", () => {
 
     expect(getByText("No todos")).toBeInTheDocument();
   });
-  it("should fetch a todo", async () => {
+  it("should add a todo", async () => {
     const { getByText, getByRole } = render(<Todos />);
 
-    await user.click(getByRole("button", { name: "Fetch a Todo" }));
-    expect(getByText("Loading...")).toBeInTheDocument();
+    await user.click(getByRole("button", { name: "Add a Todo" }));
 
-    await waitForElementToBeRemoved(() => getByText("Loading..."));
     expect(getByText("Todo 1")).toBeInTheDocument();
   });
   it("should delete a todo", async () => {
     const { getByText, getByRole } = render(<Todos />);
 
-    await user.click(getByRole("button", { name: "Fetch a Todo" }));
-    await waitForElementToBeRemoved(() => getByText("Loading..."));
+    await user.click(getByRole("button", { name: "Add a Todo" }));
+    expect(getByText("Todo 1")).toBeInTheDocument();
 
     await user.click(getByRole("button", { name: 'Delete "Todo 1"' }));
     expect(getByText("No todos")).toBeInTheDocument();

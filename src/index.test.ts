@@ -25,7 +25,7 @@ export interface Todo {
 
 const todoAdapter = createEntityAdapter<Todo>();
 
-const initialState = todoAdapter.getInitialState({ loading: false });
+const initialState = todoAdapter.getInitialState();
 
 export const todoSlice = createAppSlice({
   name: "todos",
@@ -36,45 +36,16 @@ export const todoSlice = createAppSlice({
       todoAdapter.addOne,
     ),
     todoDeleted: create.reducer(todoAdapter.removeOne),
-    fetchTodo: create.asyncThunk<Todo, void>(
-      async (_, { requestId, getState }) => {
-        await wait(250);
-        const currentLength: number = selectTotal(
-          getState() as typeof initialState,
-        );
-        return {
-          id: requestId,
-          text: `Todo ${currentLength + 1}`,
-          completed: false,
-        };
-      },
-      {
-        pending(state) {
-          state.loading = true;
-        },
-        fulfilled: todoAdapter.addOne,
-        settled(state) {
-          state.loading = false;
-        },
-      },
-    ),
   }),
   selectors: {
-    selectLoading: (state) => state.loading,
     ...todoAdapter.getSelectors(),
   },
 });
 
-export const { todoAdded, todoDeleted, fetchTodo } = todoSlice.actions;
+export const { todoAdded, todoDeleted } = todoSlice.actions;
 
-export const {
-  selectLoading,
-  selectAll,
-  selectEntities,
-  selectIds,
-  selectTotal,
-  selectById,
-} = todoSlice.getSelectors();
+export const { selectAll, selectEntities, selectIds, selectTotal, selectById } =
+  todoSlice.getSelectors();
 
 describe("useSlice", () => {
   it("should return slice's initial state, bound actions, and selectors", () => {
@@ -86,9 +57,7 @@ describe("useSlice", () => {
     expect(dispatch).toBeTypeOf("function");
     expect(dispatch.todoAdded).toBeTypeOf("function");
     expect(dispatch.todoDeleted).toBeTypeOf("function");
-    expect(dispatch.fetchTodo).toBeTypeOf("function");
 
-    expect(selectors.selectLoading).toBeTypeOf("function");
     expect(selectors.selectAll).toBeTypeOf("function");
     expect(selectors.selectEntities).toBeTypeOf("function");
     expect(selectors.selectIds).toBeTypeOf("function");
@@ -97,7 +66,7 @@ describe("useSlice", () => {
   });
 
   it("can receive an initial state separately", () => {
-    const initialState = todoAdapter.getInitialState({ loading: true }, [
+    const initialState = todoAdapter.getInitialState(undefined, [
       { id: nanoid(), text: "Todo", completed: false },
     ]);
     const { result } = renderHook(() => useSlice(todoSlice, initialState));
@@ -116,7 +85,7 @@ describe("useSlice", () => {
     const [state] = result.current;
 
     expect(state).toEqual(
-      todoAdapter.getInitialState({ loading: false }, [action.payload]),
+      todoAdapter.getInitialState(undefined, [action.payload]),
     );
   });
 
@@ -141,59 +110,6 @@ describe("useSlice", () => {
     });
 
     expect(getSelectors().selectAll()).toEqual([]);
-  });
-  it("should support bound thunks", async () => {
-    const { result } = renderHook(() => useSlice(todoSlice));
-
-    const [, dispatch] = result.current;
-    const getSelectors = () => result.current[2];
-
-    expect(getSelectors().selectLoading()).toBe(false);
-    expect(getSelectors().selectAll()).toEqual([]);
-
-    let promise = undefined as
-      | ReturnType<typeof dispatch.fetchTodo>
-      | undefined;
-
-    act(() => {
-      promise = dispatch.fetchTodo();
-    });
-
-    expect(getSelectors().selectLoading()).toBe(true);
-
-    await act(async () => {
-      await promise;
-    });
-
-    expect(getSelectors().selectLoading()).toBe(false);
-    expect(getSelectors().selectAll()).toEqual([
-      { id: promise!.requestId, text: "Todo 1", completed: false },
-    ]);
-  });
-  it("should support dispatching arbitrary thunks, which can retrieve updated state", async () => {
-    const { result } = renderHook(() => useSlice(todoSlice));
-
-    const [, dispatch] = result.current;
-
-    const thunkRan = await dispatch(async (dispatch, getState) => {
-      expect(selectTotal(getState())).toBe(0);
-
-      const {
-        payload: { id },
-      } = await act(() => dispatch(todoAdded("Todo 1")));
-
-      expect(selectTotal(getState())).toBe(1);
-
-      act(() => {
-        dispatch(todoDeleted(id));
-      });
-
-      expect(selectTotal(getState())).toBe(0);
-
-      return true;
-    });
-
-    expect(thunkRan).toBe(true);
   });
   it("can be called with plain config", () => {
     interface State {

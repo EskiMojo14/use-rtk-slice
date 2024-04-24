@@ -1,27 +1,9 @@
 import { Reducer } from "react";
-import type { ThunkAction, UnknownAction, Selector } from "@reduxjs/toolkit";
+import type { UnknownAction, Selector } from "@reduxjs/toolkit";
 
 type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
-export type SliceActions<State> = Record<
-  string,
-  (
-    ...args: any[]
-  ) => ThunkAction<any, State, void, UnknownAction> | UnknownAction
->;
-
-export type BoundActions<State, Actions extends SliceActions<State>> = Compute<{
-  [K in keyof Actions]: Actions[K] extends (...args: infer A) => infer R
-    ? R extends ThunkAction<infer T, State, void, UnknownAction>
-      ? (...args: A) => T
-      : (...args: A) => R
-    : never;
-}>;
-
-export type SliceBoundActions<S extends Slice<any, any, any>> = BoundActions<
-  ReturnType<S["getInitialState"]>,
-  S["actions"]
->;
+export type SliceActions = Record<string, (...args: any[]) => UnknownAction>;
 
 export type SliceSelectors<State> = Record<string, Selector<State>>;
 
@@ -48,7 +30,7 @@ type NoInfer<T> = [T][T extends any ? 0 : never];
 
 export interface Slice<
   State,
-  Actions extends SliceActions<State>,
+  Actions extends SliceActions,
   Selectors extends SliceSelectors<State>,
 > {
   getInitialState: () => State;

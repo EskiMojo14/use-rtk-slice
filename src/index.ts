@@ -1,20 +1,14 @@
 import { Reducer, useMemo, useReducer, useRef } from "react";
-import type {
-  ThunkAction,
-  UnknownAction,
-  Selector,
-  ThunkDispatch,
-} from "@reduxjs/toolkit";
+import type { UnknownAction, Selector, Dispatch } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import type {
-  BoundActions,
   BoundSelectors,
   Slice,
   SliceActions,
   SliceSelectors,
 } from "./types";
 
-export type { SliceBoundActions, SliceBoundSelectors } from "./types";
+export type { SliceBoundSelectors } from "./types";
 
 const id = <T>(x: T) => x;
 
@@ -41,7 +35,7 @@ function useRefReducer<State>(
 
 export function useSlice<
   State,
-  Actions extends SliceActions<State>,
+  Actions extends SliceActions,
   Selectors extends SliceSelectors<State>,
 >(
   slice: Slice<State, Actions, Selectors>,
@@ -49,8 +43,7 @@ export function useSlice<
   initialActions?: Array<UnknownAction>,
 ): [
   state: State,
-  dispatch: ThunkDispatch<State, void, UnknownAction> &
-    BoundActions<State, Actions>,
+  dispatch: Dispatch & Actions,
   selectors: BoundSelectors<State, Selectors>,
 ] {
   const [state, reactDispatch, stateRef] = useRefReducer(
@@ -61,18 +54,9 @@ export function useSlice<
     initialActions,
   );
 
-  const thunkDispatch = useMemo((): ThunkDispatch<State, void, UnknownAction> &
-    BoundActions<State, Actions> => {
-    const thunkDispatch = (
-      action: UnknownAction | ThunkAction<any, State, void, UnknownAction>,
-    ) =>
-      typeof action === "function"
-        ? action(thunkDispatch, () => stateRef.current)
-        : (reactDispatch(action), action); // dispatch the action and return it
-    return Object.assign(
-      thunkDispatch,
-      bindActionCreators(slice.actions, thunkDispatch),
-    ) as any;
+  const dispatch = useMemo(() => {
+    const dispatch: Dispatch = (action) => (reactDispatch(action), action); // dispatch the action and return it
+    return Object.assign(dispatch, bindActionCreators(slice.actions, dispatch));
   }, [slice.actions]);
 
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
@@ -84,5 +68,5 @@ export function useSlice<
     return result as any;
   }, [slice.getSelectors, state]);
 
-  return [state, thunkDispatch, boundSelectors];
+  return [state, dispatch, boundSelectors];
 }
