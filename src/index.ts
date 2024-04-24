@@ -10,11 +10,11 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 
 type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
-type Creator<T> = (...args: any[]) => T;
-
 type SliceActions<State> = Record<
   string,
-  Creator<ThunkAction<any, State, void, UnknownAction> | UnknownAction>
+  (
+    ...args: any[]
+  ) => ThunkAction<any, State, void, UnknownAction> | UnknownAction
 >;
 
 type BoundActions<Actions extends SliceActions<any>> = Compute<{
@@ -25,34 +25,36 @@ type BoundActions<Actions extends SliceActions<any>> = Compute<{
     : never;
 }>;
 
-type SliceSelectors<State> = Record<string, Selector<State, any>>;
+type SliceSelectors<State> = Record<string, Selector<State>>;
 
-type BoundSelectors<
-  State,
-  Selectors extends SliceSelectors<any>,
-> = string extends keyof Selectors
-  ? {} // if no selectors are provided to the slice, it gets a default index signature of string - avoid copying over that behaviour
-  : Compute<{
-      [K in keyof Selectors]: Selectors[K] extends Selector<
-        State,
-        infer Result,
-        infer Args
-      >
-        ? (...args: Args) => Result
-        : never;
-    }>;
+type BoundSelectors<State, Selectors extends SliceSelectors<any>> = Compute<{
+  [K in keyof Selectors]: Selectors[K] extends Selector<
+    State,
+    infer Result,
+    infer Args
+  >
+    ? (...args: Args) => Result
+    : never;
+}>;
+
+type BivariantSelector<S extends Selector> =
+  S extends Selector<infer State, infer Result, infer Args>
+    ? {
+        "bivarianceHack"(state: State, ...args: Args): Result;
+      }["bivarianceHack"]
+    : never;
 
 interface Slice<
   State,
   Actions extends SliceActions<State>,
   Selectors extends SliceSelectors<State>,
 > {
-  reducer: Reducer<State, UnknownAction>;
   getInitialState: () => State;
+  reducer: Reducer<State, UnknownAction>;
   actions: Actions;
   getSelectors(): {
-    [K in keyof Selectors]: Selectors[K] & {
-      unwrapped?: Selectors[K];
+    [K in keyof Selectors]: BivariantSelector<Selectors[K]> & {
+      unwrapped: Selectors[K];
     };
   };
 }
@@ -92,9 +94,8 @@ export function useSlice<
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
     const selectors = slice.getSelectors();
     const result: Record<string, Selector> = {};
-    for (const key of Object.keys(selectors)) {
-      result[key] = (...args) =>
-        selectors[key as keyof Selectors](stateRef.current, ...args);
+    for (const [key, selector] of Object.entries(selectors)) {
+      result[key] = (...args) => selector(stateRef.current, ...args);
     }
     return result as any;
   }, [slice.getSelectors]);
