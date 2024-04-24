@@ -1,4 +1,4 @@
-import { useMemo, useReducer, Reducer, useRef } from "react";
+import { useMemo, useReducer, useRef } from "react";
 import type {
   ThunkAction,
   UnknownAction,
@@ -6,48 +6,13 @@ import type {
   ThunkDispatch,
 } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
-
-type Compute<T> = { [K in keyof T]: T[K] } & unknown;
-
-type SliceActions<State> = Record<
-  string,
-  (
-    ...args: any[]
-  ) => ThunkAction<any, State, void, UnknownAction> | UnknownAction
->;
-
-type BoundActions<State, Actions extends SliceActions<State>> = Compute<{
-  [K in keyof Actions]: Actions[K] extends (...args: infer A) => infer R
-    ? R extends ThunkAction<infer T, State, void, UnknownAction>
-      ? (...args: A) => T
-      : (...args: A) => R
-    : never;
-}>;
-
-type SliceSelectors<State> = Record<string, Selector<State>>;
-
-type BoundSelectors<State, Selectors extends SliceSelectors<any>> = Compute<{
-  [K in keyof Selectors]: Selectors[K] extends Selector<
-    State,
-    infer Result,
-    infer Args
-  >
-    ? (...args: Args) => Result
-    : never;
-}>;
-
-type NoInfer<T> = [T][T extends any ? 0 : never];
-
-interface Slice<
-  State,
-  Actions extends SliceActions<State>,
-  Selectors extends SliceSelectors<State>,
-> {
-  getInitialState: () => State;
-  reducer: Reducer<State, UnknownAction>;
-  actions: Actions;
-  getSelectors(arg: (state: NoInfer<State>) => NoInfer<State>): Selectors;
-}
+import {
+  BoundActions,
+  BoundSelectors,
+  Slice,
+  SliceActions,
+  SliceSelectors,
+} from "./types";
 
 const id = <T>(x: T) => x;
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  Selector,
   asyncThunkCreator,
   buildCreateSlice,
   createAction,
@@ -8,6 +9,7 @@ import {
 } from "@reduxjs/toolkit";
 import { act, renderHook } from "@testing-library/react";
 import { useSlice } from ".";
+import { useCallback, useMemo } from "react";
 
 const createAppSlice = buildCreateSlice({
   creators: { asyncThunk: asyncThunkCreator },
@@ -161,28 +163,30 @@ describe("useSlice", () => {
     expect(thunkRan).toBe(true);
   });
   it("can be called with plain config", () => {
-    const initialState = { count: 0 };
+    interface State {
+      count: number;
+    }
+    const initialState: State = { count: 0 };
     const increment = createAction("increment");
     const { result } = renderHook(() =>
       useSlice({
+        // these two don't need to be stable
         getInitialState: () => initialState,
-        reducer(state = initialState, action) {
+        reducer(state, action) {
           if (increment.match(action)) {
             return { count: state.count + 1 };
           }
           return state;
         },
-        actions: { increment },
-        getSelectors() {
-          const selectCount = (state: typeof initialState) => state.count;
-          return {
-            selectCount: Object.assign(
-              selectCount,
-              // TODO: our inference is based on this unwrapped selector, annoyingly
-              { unwrapped: selectCount },
-            ),
-          };
-        },
+        // these two need to be stable
+        actions: useMemo(() => ({ increment }), []),
+        getSelectors: useCallback(
+          () =>
+            ({
+              selectCount: (state) => state.count,
+            }) satisfies Record<string, Selector<State>>,
+          [],
+        ),
       }),
     );
 
