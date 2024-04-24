@@ -37,6 +37,8 @@ type BoundSelectors<State, Selectors extends SliceSelectors<any>> = Compute<{
     : never;
 }>;
 
+type NoInfer<T> = [T][T extends any ? 0 : never];
+
 interface Slice<
   State,
   Actions extends SliceActions<State>,
@@ -45,8 +47,10 @@ interface Slice<
   getInitialState: () => State;
   reducer: (state: State, action: UnknownAction) => State; // unlike the Redux version of Reducer, this one will never be called with undefined
   actions: Actions;
-  getSelectors(arg: never): Selectors;
+  getSelectors(arg: (state: NoInfer<State>) => NoInfer<State>): Selectors;
 }
+
+const id = <T>(x: T) => x;
 
 export function useSlice<
   State,
@@ -82,7 +86,7 @@ export function useSlice<
   }, [slice.actions]);
 
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
-    const selectors = slice.getSelectors(undefined as never);
+    const selectors = slice.getSelectors(id);
     const result: Record<string, Selector> = {};
     for (const [key, selector] of Object.entries<Selector>(selectors)) {
       result[key] = selector.bind(null, state);
