@@ -84,19 +84,16 @@ describe("useSlice", () => {
     expect(selectors.selectById).toBeTypeOf("function");
   });
 
-  it("should update state when actions are called", () => {
+  it("should update state when actions are called", async () => {
     const { result } = renderHook(() => useSlice(todoSlice));
 
     const [, dispatch, selectors] = result.current;
 
     expect(selectors.selectAll()).toEqual([]);
 
-    let id = "";
-    act(() => {
-      ({
-        payload: { id },
-      } = dispatch.todoAdded("Todo 1"));
-    });
+    const {
+      payload: { id },
+    } = await act(() => dispatch.todoAdded("Todo 1"));
 
     expect(selectors.selectAll()).toEqual([
       { id, text: "Todo 1", completed: false },
@@ -135,20 +132,17 @@ describe("useSlice", () => {
       { id: promise!.requestId, text: "Todo", completed: false },
     ]);
   });
-  it("should support dispatching arbitrary thunks, which can retrieve updated state", () => {
+  it("should support dispatching arbitrary thunks, which can retrieve updated state", async () => {
     const { result } = renderHook(() => useSlice(todoSlice));
 
     const [, dispatch] = result.current;
 
-    const thunkRan = dispatch((dispatch, getState) => {
+    const thunkRan = await dispatch(async (dispatch, getState) => {
       expect(selectTotal(getState())).toBe(0);
 
-      let id = "";
-      act(() => {
-        ({
-          payload: { id },
-        } = dispatch(todoAdded("Todo 1")));
-      });
+      const {
+        payload: { id },
+      } = await act(() => dispatch(todoAdded("Todo 1")));
 
       expect(selectTotal(getState())).toBe(1);
 
