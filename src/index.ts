@@ -17,9 +17,9 @@ type SliceActions<State> = Record<
   ) => ThunkAction<any, State, void, UnknownAction> | UnknownAction
 >;
 
-type BoundActions<Actions extends SliceActions<any>> = Compute<{
+type BoundActions<State, Actions extends SliceActions<State>> = Compute<{
   [K in keyof Actions]: Actions[K] extends (...args: infer A) => infer R
-    ? R extends ThunkAction<infer T, any, any, any>
+    ? R extends ThunkAction<infer T, State, void, UnknownAction>
       ? (...args: A) => T
       : (...args: A) => R
     : never;
@@ -67,7 +67,8 @@ export function useSlice<
   slice: Slice<State, Actions, Selectors>,
 ): [
   state: State,
-  dispatch: ThunkDispatch<State, void, UnknownAction> & BoundActions<Actions>,
+  dispatch: ThunkDispatch<State, void, UnknownAction> &
+    BoundActions<State, Actions>,
   selectors: BoundSelectors<State, Selectors>,
 ] {
   const stateRef = useRef(slice.getInitialState());
@@ -78,7 +79,7 @@ export function useSlice<
   );
 
   const thunkDispatch = useMemo((): ThunkDispatch<State, void, UnknownAction> &
-    BoundActions<Actions> => {
+    BoundActions<State, Actions> => {
     const thunkDispatch = (
       action: UnknownAction | ThunkAction<any, State, void, UnknownAction>,
     ) =>

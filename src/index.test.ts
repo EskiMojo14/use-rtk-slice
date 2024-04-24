@@ -33,7 +33,7 @@ const todoSlice = createAppSlice({
     todoDeleted: create.reducer(todoAdapter.removeOne),
     fetchTodo: create.asyncThunk<Todo, void>(
       async (_, { requestId }) => {
-        await wait(500);
+        await wait(250);
         return { id: requestId, text: "Todo", completed: false };
       },
       {
@@ -88,7 +88,7 @@ describe("useSlice", () => {
     });
 
     expect(selectors.selectAll()).toEqual([
-      { id: expect.any(String), text: "Todo 1", completed: false },
+      { id, text: "Todo 1", completed: false },
     ]);
 
     act(() => {
