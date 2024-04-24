@@ -30,13 +30,15 @@ const initialState = todoAdapter.getInitialState();
 export const todoSlice = createAppSlice({
   name: "todos",
   initialState,
-  reducers: (create) => ({
-    todoAdded: create.preparedReducer(
-      (text: string) => ({ payload: { id: nanoid(), text, completed: false } }),
-      todoAdapter.addOne,
-    ),
-    todoDeleted: create.reducer(todoAdapter.removeOne),
-  }),
+  reducers: {
+    todoAdded: {
+      prepare: (text: string) => ({
+        payload: { id: nanoid(), text, completed: false },
+      }),
+      reducer: todoAdapter.addOne,
+    },
+    todoDeleted: todoAdapter.removeOne,
+  },
   selectors: {
     ...todoAdapter.getSelectors(),
   },
