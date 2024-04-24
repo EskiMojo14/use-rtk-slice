@@ -6,7 +6,7 @@ import type {
   ThunkDispatch,
 } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import {
+import type {
   BoundActions,
   BoundSelectors,
   Slice,
@@ -14,7 +14,7 @@ import {
   SliceSelectors,
 } from "./types";
 
-export { SliceBoundActions, SliceBoundSelectors } from "./types";
+export type { SliceBoundActions, SliceBoundSelectors } from "./types";
 
 const id = <T>(x: T) => x;
 
