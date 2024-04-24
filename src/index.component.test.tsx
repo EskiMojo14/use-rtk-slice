@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { useSlice } from ".";
 import { Todo, todoSlice } from "./index.test";
-import { render, waitForElementToBeRemoved } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 interface TodoItemProps {
