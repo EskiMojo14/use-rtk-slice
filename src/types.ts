@@ -18,6 +18,11 @@ export type BoundActions<State, Actions extends SliceActions<State>> = Compute<{
     : never;
 }>;
 
+export type SliceBoundActions<S extends Slice<any, any, any>> = BoundActions<
+  ReturnType<S["getInitialState"]>,
+  S["actions"]
+>;
+
 export type SliceSelectors<State> = Record<string, Selector<State>>;
 
 export type BoundSelectors<
@@ -32,6 +37,12 @@ export type BoundSelectors<
     ? (...args: Args) => Result
     : never;
 }>;
+
+export type SliceBoundSelectors<S extends Slice<any, any, any>> =
+  BoundSelectors<
+    ReturnType<S["getInitialState"]>,
+    ReturnType<S["getSelectors"]>
+  >;
 
 type NoInfer<T> = [T][T extends any ? 0 : never];
 

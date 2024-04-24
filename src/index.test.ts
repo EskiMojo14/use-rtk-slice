@@ -17,7 +17,7 @@ const createAppSlice = buildCreateSlice({
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-interface Todo {
+export interface Todo {
   id: string;
   text: string;
   completed: boolean;
@@ -25,7 +25,7 @@ interface Todo {
 
 const todoAdapter = createEntityAdapter<Todo>();
 
-const todoSlice = createAppSlice({
+export const todoSlice = createAppSlice({
   name: "todos",
   initialState: todoAdapter.getInitialState({ loading: false }),
   reducers: (create) => ({
@@ -85,6 +85,30 @@ describe("useSlice", () => {
     expect(selectors.selectIds).toBeTypeOf("function");
     expect(selectors.selectTotal).toBeTypeOf("function");
     expect(selectors.selectById).toBeTypeOf("function");
+  });
+
+  it("can receive an initial state separately", () => {
+    const initialState = todoAdapter.getInitialState({ loading: true }, [
+      { id: nanoid(), text: "Todo", completed: false },
+    ]);
+    const { result } = renderHook(() => useSlice(todoSlice, initialState));
+
+    const [state] = result.current;
+
+    expect(state).toEqual(initialState);
+  });
+
+  it("can receive initializing actions, which are applied during setup", () => {
+    const action = todoAdded("Todo 1");
+    const { result } = renderHook(() =>
+      useSlice(todoSlice, undefined, [action]),
+    );
+
+    const [state] = result.current;
+
+    expect(state).toEqual(
+      todoAdapter.getInitialState({ loading: false }, [action.payload]),
+    );
   });
 
   it("should update state when actions are called", async () => {
