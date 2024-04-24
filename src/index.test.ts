@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   asyncThunkCreator,
   buildCreateSlice,
+  createAction,
   createEntityAdapter,
   nanoid,
 } from "@reduxjs/toolkit";
@@ -158,5 +159,41 @@ describe("useSlice", () => {
     });
 
     expect(thunkRan).toBe(true);
+  });
+  it("can be called with plain config", () => {
+    const initialState = { count: 0 };
+    const increment = createAction("increment");
+    const { result } = renderHook(() =>
+      useSlice({
+        getInitialState: () => initialState,
+        reducer(state = initialState, action) {
+          if (increment.match(action)) {
+            return { count: state.count + 1 };
+          }
+          return state;
+        },
+        actions: { increment },
+        getSelectors() {
+          const selectCount = (state: typeof initialState) => state.count;
+          return {
+            selectCount: Object.assign(
+              selectCount,
+              // TODO: our inference is based on this unwrapped selector, annoyingly
+              { unwrapped: selectCount },
+            ),
+          };
+        },
+      }),
+    );
+
+    const [state, dispatch, selectors] = result.current;
+
+    expect(state).toEqual(initialState);
+
+    expect(dispatch).toBeTypeOf("function");
+    expect(dispatch.increment).toBeTypeOf("function");
+
+    expect(selectors.selectCount).toBeTypeOf("function");
+    expect(selectors.selectCount()).toBe(0);
   });
 });

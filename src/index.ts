@@ -37,26 +37,15 @@ type BoundSelectors<State, Selectors extends SliceSelectors<any>> = Compute<{
     : never;
 }>;
 
-type BivariantSelector<S extends Selector> =
-  S extends Selector<infer State, infer Result, infer Args>
-    ? {
-        bivarianceHack(state: State, ...args: Args): Result;
-      }["bivarianceHack"]
-    : never;
-
 interface Slice<
   State,
   Actions extends SliceActions<State>,
   Selectors extends SliceSelectors<State>,
 > {
   getInitialState: () => State;
-  reducer: Reducer<State, UnknownAction>;
+  reducer: (state: State, action: UnknownAction) => State; // unlike the Redux version of Reducer, this one will never be called with undefined
   actions: Actions;
-  getSelectors(): {
-    [K in keyof Selectors]: BivariantSelector<Selectors[K]> & {
-      unwrapped: Selectors[K];
-    };
-  };
+  getSelectors(arg: never): Selectors;
 }
 
 export function useSlice<
@@ -73,7 +62,7 @@ export function useSlice<
 ] {
   const stateRef = useRef(slice.getInitialState());
 
-  const [state, reactDispatch] = useReducer<Reducer<State, UnknownAction>>(
+  const [state, reactDispatch] = useReducer<typeof slice.reducer>(
     (state, action) => (stateRef.current = slice.reducer(state, action)),
     stateRef.current,
   );
@@ -93,7 +82,7 @@ export function useSlice<
   }, [slice.actions]);
 
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
-    const selectors = slice.getSelectors();
+    const selectors = slice.getSelectors(undefined as never);
     const result: Record<string, Selector> = {};
     for (const [key, selector] of Object.entries<Selector>(selectors)) {
       result[key] = selector.bind(null, state);
