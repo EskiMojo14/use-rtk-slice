@@ -1,21 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   Selector,
-  asyncThunkCreator,
-  buildCreateSlice,
   createAction,
   createEntityAdapter,
+  createSlice,
   nanoid,
 } from "@reduxjs/toolkit";
 import { act, renderHook } from "@testing-library/react";
 import { useSlice } from ".";
 import { useCallback, useMemo } from "react";
-
-const createAppSlice = buildCreateSlice({
-  creators: { asyncThunk: asyncThunkCreator },
-});
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface Todo {
   id: string;
@@ -27,7 +20,7 @@ const todoAdapter = createEntityAdapter<Todo>();
 
 const initialState = todoAdapter.getInitialState();
 
-export const todoSlice = createAppSlice({
+export const todoSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
