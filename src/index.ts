@@ -38,15 +38,18 @@ export function useSlice<
     return Object.assign(dispatch, bindActionCreators(slice.actions, dispatch));
   }, [slice.actions]);
 
+  const unboundSelectors = useMemo(
+    () => slice.getSelectors(id),
+    [slice.getSelectors],
+  );
+
   const boundSelectors = useMemo((): BoundSelectors<State, Selectors> => {
     const result: Record<string, Selector> = {};
-    for (const [key, selector] of Object.entries<Selector>(
-      slice.getSelectors(id),
-    )) {
+    for (const [key, selector] of Object.entries<Selector>(unboundSelectors)) {
       result[key] = selector.bind(null, state);
     }
     return result as any;
-  }, [slice.getSelectors, state]);
+  }, [unboundSelectors, state]);
 
   return [boundSelectors, dispatch, state];
 }
