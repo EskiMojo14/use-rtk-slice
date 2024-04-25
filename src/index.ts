@@ -10,7 +10,7 @@ import type {
 
 export type { SliceBoundSelectors } from "./types";
 
-const id = <T>(x: T) => x;
+export const id = <T>(x: T) => x;
 
 export function useSlice<
   State,
@@ -27,10 +27,12 @@ export function useSlice<
 ] {
   const [state, reactDispatch] = useReducer(
     slice.reducer,
-    typeof initialState === "undefined"
-      ? slice.getInitialState()
-      : initialState,
-    (initialState) => initialActions.reduce(slice.reducer, initialState),
+    initialActions.reduce(
+      slice.reducer,
+      typeof initialState === "undefined"
+        ? slice.getInitialState()
+        : initialState,
+    ),
   );
 
   const dispatch = useMemo(() => {

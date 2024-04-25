@@ -74,5 +74,8 @@
   "peerDependencies": {
     "@reduxjs/toolkit": "^2.0",
     "react": ">=16.8.0"
+  },
+  "dependencies": {
+    "@redux-devtools/extension": "^3.3.0"
   }
 }
