@@ -1,14 +1,14 @@
-import { describe, expect, it } from "vitest";
+import type { Selector } from "@reduxjs/toolkit";
 import {
-  Selector,
   createAction,
   createEntityAdapter,
   createSlice,
   nanoid,
 } from "@reduxjs/toolkit";
 import { act, renderHook } from "@testing-library/react";
-import { useSlice } from ".";
 import { useCallback, useMemo } from "react";
+import { describe, expect, it } from "vitest";
+import { useSlice } from ".";
 
 export interface Todo {
   id: string;
