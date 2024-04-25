@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from "react";
+import { useDebugValue, useMemo, useReducer } from "react";
 import type { UnknownAction, Selector, Dispatch } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import type {
@@ -50,6 +50,8 @@ export function useSlice<
     }
     return result as any;
   }, [unboundSelectors, state]);
+
+  useDebugValue(state);
 
   return [boundSelectors, dispatch, state];
 }
