@@ -1,6 +1,7 @@
 import type { Config } from "@redux-devtools/extension";
-import { Action } from "@reduxjs/toolkit";
-import { useReducer, Reducer, useRef, useEffect, useState } from "react";
+import type { Action } from "@reduxjs/toolkit";
+import type { Reducer } from "react";
+import { useReducer, useRef, useEffect } from "react";
 
 type ConnectResponse = ReturnType<
   NonNullable<typeof window.__REDUX_DEVTOOLS_EXTENSION__>["connect"]
@@ -9,7 +10,7 @@ type ConnectResponse = ReturnType<
 const withActions =
   <S, A extends Action>(
     reducer: Reducer<S, A>,
-  ): Reducer<{ state: S; actions: [A, S][] }, A> =>
+  ): Reducer<{ state: S; actions: Array<[A, S]> }, A> =>
   (state, action) => {
     const nextState = reducer(state.state, action);
     return {
@@ -39,7 +40,7 @@ export function useReducerWithDevtools<S, A extends Action>(
       // @ts-expect-error undocumented
       instanceId: instanceIdRef.current,
     });
-    connectionRef.current?.init(initialState);
+    connectionRef.current.init(initialState);
   }
   const [{ state, actions }, dispatch] = useReducer(withActions(reducer), {
     state: initialState,
@@ -53,6 +54,6 @@ export function useReducerWithDevtools<S, A extends Action>(
         history = actions.shift();
       }
     }
-  }, [actions, connectionRef.current]);
+  }, [actions]);
   return [state, dispatch] as const;
 }
