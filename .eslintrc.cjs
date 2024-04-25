@@ -42,7 +42,7 @@ module.exports = {
     {
       files: ["**/*.test.ts"],
       plugins: ["vitest"],
-      extends: ["plugin:vitest/recommended"],
+      extends: ["plugin:vitest/legacy-recommended"],
     },
   ],
 };
