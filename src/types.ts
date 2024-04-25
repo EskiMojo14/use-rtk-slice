@@ -1,9 +1,12 @@
-import { Reducer } from "react";
 import type { UnknownAction, Selector } from "@reduxjs/toolkit";
+import type { Reducer } from "react";
 
 type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
-export type SliceActions = Record<string, (...args: any[]) => UnknownAction>;
+export type SliceActions = Record<
+  string,
+  (...args: Array<any>) => UnknownAction
+>;
 
 export type SliceSelectors<State> = Record<string, Selector<State>>;
 
