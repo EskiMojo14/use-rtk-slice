@@ -1,19 +1,20 @@
 import type { UnknownAction, Selector, Dispatch } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import { useDebugValue, useMemo, useReducer } from "react";
+import { useDebugValue, useMemo } from "react";
 import type {
   BoundSelectors,
   Slice,
   SliceActions,
   SliceSelectors,
 } from "./types";
+import { useReducerWithDevtools } from "use-reducer-devtools";
 
 export type { SliceBoundSelectors } from "./types";
 
 export const id = <T>(x: T) => x;
 
 export function useSlice<
-  State,
+  State extends NonNullable<unknown> | null,
   Actions extends SliceActions,
   Selectors extends SliceSelectors<State>,
 >(
@@ -25,14 +26,16 @@ export function useSlice<
   dispatch: Dispatch & Actions,
   state: State,
 ] {
-  const [state, reactDispatch] = useReducer(
+  const [state, reactDispatch] = useReducerWithDevtools(
     slice.reducer,
-    initialActions.reduce(
-      slice.reducer,
-      typeof initialState === "undefined"
-        ? slice.getInitialState()
-        : initialState,
-    ),
+    () =>
+      initialActions.reduce(
+        slice.reducer,
+        typeof initialState === "undefined"
+          ? slice.getInitialState()
+          : initialState,
+      ),
+    { name: `useSlice(${slice.name})`, actionCreators: slice.actions },
   );
 
   const dispatch = useMemo(() => {

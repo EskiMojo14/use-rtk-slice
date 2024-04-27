@@ -36,6 +36,7 @@ export interface Slice<
   Actions extends SliceActions,
   Selectors extends SliceSelectors<State>,
 > {
+  name: string;
   getInitialState: () => State;
   reducer: Reducer<State, UnknownAction>;
   actions: Actions;
