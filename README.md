@@ -49,6 +49,8 @@ However, if you want to provide an initial state, you can do so by passing it as
 
 ```tsx
 const [selectors, dispatch] = useSlice(counterSlice, { value: 10 });
+
+console.log(selectors.selectCount()); // 10
 ```
 
 The third argument is a list of actions to reduce the initial state provided with, to get a "final" initial state.
