@@ -1,16 +1,20 @@
 import "./App.css";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSlice } from "use-rtk-slice";
 
 const counterSlice = createSlice({
   name: "counter",
-  initialState: 0,
+  initialState: { value: 0 },
   reducers: {
-    increment: (state) => state + 1,
-    decrement: (state) => state - 1,
+    increment(state) {
+      state.value += 1;
+    },
+    decrementBy(state, { payload }: PayloadAction<number>) {
+      state.value -= payload;
+    },
   },
   selectors: {
-    selectCount: (state) => state,
+    selectCount: (state) => state.value,
   },
 });
 
@@ -24,7 +28,7 @@ function App() {
           <code>count</code> is {selectors.selectCount()}
         </p>
         <button onClick={() => dispatch.increment()}>increment</button>
-        <button onClick={() => dispatch.decrement()}>decrement</button>
+        <button onClick={() => dispatch.decrementBy(1)}>decrement</button>
       </div>
     </>
   );
