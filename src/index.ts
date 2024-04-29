@@ -1,13 +1,13 @@
 import type { UnknownAction, Selector, Dispatch } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { useDebugValue, useMemo } from "react";
+import { useReducerWithDevtools } from "use-reducer-devtools";
 import type {
   BoundSelectors,
   Slice,
   SliceActions,
   SliceSelectors,
 } from "./types";
-import { useReducerWithDevtools } from "use-reducer-devtools";
 
 export type { SliceBoundSelectors } from "./types";
 

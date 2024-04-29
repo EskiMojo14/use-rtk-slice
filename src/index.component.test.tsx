@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { useSlice } from ".";
-import { Todo, todoSlice } from "./index.test";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect } from "vitest";
+import type { Todo } from "./index.test";
+import { todoSlice } from "./index.test";
+import { useSlice } from ".";
 
 interface TodoItemProps {
   todo: Todo;
@@ -13,7 +14,9 @@ const TodoItem = ({ todo, onDelete }: TodoItemProps) => (
   <li>
     <span>{todo.text}</span>
     <button
-      onClick={() => onDelete(todo.id)}
+      onClick={() => {
+        onDelete(todo.id);
+      }}
       aria-label={`Delete "${todo.text}"`}
     >
       Delete
