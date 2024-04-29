@@ -36,7 +36,13 @@ const Counter = () => {
 The actions are bound to the original `dispatch` function, so non-bound actions can be dispatched as well.
 
 ```ts
-dispatch(anExternalAction());
+import { anExternalAction } from "./actions";
+
+function MyComponent() {
+  const [selectors, dispatch] = useSlice(counterSlice);
+
+  dispatch(anExternalAction());
+}
 ```
 
 Also includes Redux DevTools integration, using [`use-reducer-devtools`](https://github.com/EskiMojo14/use-reducer-devtools). This allows you to inspect the state and actions in the Redux DevTools extension, and even use time-travel debugging.
