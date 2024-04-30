@@ -112,6 +112,7 @@ Note that `use-local-slice` does not include Redux DevTools integration, or sele
 While not recommended, you can also use `use-rtk-slice` without `createSlice`:
 
 ```tsx
+import { useMemo, useCallback } from "react";
 import { useSlice } from "use-rtk-slice";
 
 const Counter = () => {
