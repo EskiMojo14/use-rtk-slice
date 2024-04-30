@@ -22,15 +22,13 @@ function App() {
   const [selectors, dispatch] = useSlice(counterSlice);
 
   return (
-    <>
-      <div className="card">
-        <p>
-          <code>count</code> is {selectors.selectCount()}
-        </p>
-        <button onClick={() => dispatch.increment()}>increment</button>
-        <button onClick={() => dispatch.decrementBy(1)}>decrement</button>
-      </div>
-    </>
+    <div className="card">
+      <p>
+        <code>count</code> is {selectors.selectCount()}
+      </p>
+      <button onClick={() => dispatch.increment()}>increment</button>
+      <button onClick={() => dispatch.decrementBy(1)}>decrement</button>
+    </div>
   );
 }
 
