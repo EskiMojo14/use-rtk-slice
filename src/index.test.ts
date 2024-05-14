@@ -74,7 +74,9 @@ describe("useSlice", () => {
   it("can receive initializing actions, which are applied during setup", () => {
     const action = todoAdded("Todo 1");
     const { result } = renderHook(() =>
-      useSlice(todoSlice, undefined, [action]),
+      useSlice(todoSlice, undefined, {
+        initialActions: [action],
+      }),
     );
 
     const [, , state] = result.current;
