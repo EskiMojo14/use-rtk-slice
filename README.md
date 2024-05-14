@@ -22,7 +22,7 @@ const counterSlice = createSlice({
 });
 
 const Counter = () => {
-  const [selectors, dispatch] = useSlice(counterSlice);
+  const [selectors, dispatch, state] = useSlice(counterSlice);
   return (
     <div>
       <button onClick={() => dispatch.increment()}>+</button>
@@ -39,7 +39,7 @@ The actions are bound to the original `dispatch` function, so non-bound actions 
 import { anExternalAction } from "./actions";
 
 function MyComponent() {
-  const [selectors, dispatch] = useSlice(counterSlice);
+  const [selectors, dispatch, state] = useSlice(counterSlice);
 
   dispatch(anExternalAction());
 }
@@ -54,7 +54,7 @@ Slices already have an initial state set (made available with `getInitialState`)
 However, if you want to provide an initial state, you can do so by passing it as part of the second argument to `useSlice`.
 
 ```tsx
-const [selectors, dispatch] = useSlice(counterSlice, {
+const [selectors, dispatch, state] = useSlice(counterSlice, {
   initialState: { value: 10 },
 });
 
@@ -64,7 +64,7 @@ console.log(selectors.selectCount()); // 10
 You can also provide an array of actions to calculate the initial state.
 
 ```tsx
-const [selectors, dispatch] = useSlice(counterSlice, {
+const [selectors, dispatch, state] = useSlice(counterSlice, {
   initialState: { value: 10 },
   initialActions: [increment(), increment()],
 });
