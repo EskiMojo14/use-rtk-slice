@@ -51,21 +51,23 @@ Also includes Redux DevTools integration, using [`use-reducer-devtools`](https:/
 
 Slices already have an initial state set (made available with `getInitialState`), so you don't need to provide an initial state to `useSlice`.
 
-However, if you want to provide an initial state, you can do so by passing it as the second argument to `useSlice`.
+However, if you want to provide an initial state, you can do so by passing it as part of the second argument to `useSlice`.
 
 ```tsx
-const [selectors, dispatch] = useSlice(counterSlice, { value: 10 });
+const [selectors, dispatch] = useSlice(counterSlice, {
+  initialState: { value: 10 },
+});
 
 console.log(selectors.selectCount()); // 10
 ```
 
-The third argument is a list of actions to reduce the initial state provided with, to get a "final" initial state.
+You can also provide an array of actions to calculate the initial state.
 
 ```tsx
-const [selectors, dispatch] = useSlice(counterSlice, { value: 10 }, [
-  increment(),
-  increment(),
-]);
+const [selectors, dispatch] = useSlice(counterSlice, {
+  initialState: { value: 10 },
+  initialActions: [increment(), increment()],
+});
 
 console.log(selectors.selectCount()); // 12
 ```
