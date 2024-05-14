@@ -18,7 +18,14 @@ export type { SliceBoundSelectors } from "./types";
 export const id = <T>(x: T) => x;
 
 interface UseSliceConfig<State> {
+  /**
+   * Actions to be applied when calculating an initial state.
+   * Will not be recorded in the devtools.
+   */
   initialActions?: Array<UnknownAction>;
+  /**
+   * Configuration for the devtools integration.
+   */
   devTools?: DevtoolsConfig<State, UnknownAction>;
 }
 
