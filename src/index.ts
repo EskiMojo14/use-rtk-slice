@@ -5,6 +5,7 @@ import type { DevtoolsConfig } from "use-reducer-devtools";
 import {
   useReducerWithDevtools,
   useReducerWithLazyState,
+  useReducerWithProdDevtools,
 } from "use-reducer-devtools";
 import type {
   BoundSelectors,
@@ -94,5 +95,9 @@ function makeUseSlice(useReducer: typeof useReducerWithDevtools) {
 }
 
 export const useSlice = makeUseSlice(useReducerWithDevtools);
+
+export const useSliceWithProdDevtools = makeUseSlice(
+  useReducerWithProdDevtools,
+);
 
 export const useSliceWithoutDevtools = makeUseSlice(useReducerWithLazyState);
