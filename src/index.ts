@@ -8,6 +8,7 @@ import {
 } from "use-reducer-devtools";
 import type {
   BoundSelectors,
+  NotUndefined,
   Slice,
   SliceActions,
   SliceSelectors,
@@ -17,7 +18,12 @@ export type { SliceBoundSelectors } from "./types";
 
 export const id = <T>(x: T) => x;
 
-interface UseSliceConfig<State> {
+interface UseSliceConfig<State extends NotUndefined> {
+  /**
+   * Initial state for the reducer.
+   * If not provided, the slice's initial state will be used.
+   */
+  initialState?: State;
   /**
    * Actions to be applied when calculating an initial state.
    * Will not be recorded in the devtools.
@@ -31,13 +37,12 @@ interface UseSliceConfig<State> {
 
 function makeUseSlice(useReducer: typeof useReducerWithDevtools) {
   return function useSlice<
-    State extends NonNullable<unknown> | null,
+    State extends NotUndefined,
     Actions extends SliceActions,
     Selectors extends SliceSelectors<State>,
   >(
     slice: Slice<State, Actions, Selectors>,
-    initialState?: State,
-    { initialActions = [], devTools }: UseSliceConfig<State> = {},
+    { initialState, initialActions = [], devTools }: UseSliceConfig<State> = {},
   ): [
     selectors: BoundSelectors<State, Selectors>,
     dispatch: Dispatch & Actions,

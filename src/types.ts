@@ -3,6 +3,8 @@ import type { Reducer } from "react";
 
 type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
+export type NotUndefined = NonNullable<unknown> | null;
+
 export type SliceActions = Record<string, ActionCreator<UnknownAction>>;
 
 export type SliceSelectors<State> = Record<string, Selector<State>>;
