@@ -114,6 +114,7 @@ describe("useSlice", () => {
     const increment = createAction("increment");
     const { result } = renderHook(() =>
       useSlice({
+        name: "counter",
         // these two don't need to be stable
         getInitialState: () => initialState,
         reducer(state, action) {
