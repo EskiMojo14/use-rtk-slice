@@ -5947,16 +5947,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-reducer-devtools@portal:../use-reducer-devtools::locator=use-rtk-slice%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "use-reducer-devtools@portal:../use-reducer-devtools::locator=use-rtk-slice%40workspace%3A."
+"use-reducer-devtools@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "use-reducer-devtools@npm:0.1.0"
   dependencies:
     "@redux-devtools/extension": "npm:^3.3.0"
     "@redux-devtools/utils": "npm:^3.0.0"
   peerDependencies:
     react: ">=16.8.0"
+  checksum: 10c0/417c4458fb9e034aec077e5e76170686708e98bf3288fe7f7364bfd1165775a4ab5c2d0ec7169000aa5b69b1e4ead132a357cc59c67b5dbd26bfed4f7a80544f
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "use-rtk-slice@workspace:., use-rtk-slice@workspace:^":
   version: 0.0.0-use.local
@@ -5987,7 +5988,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     tsup: "npm:^8.0.2"
     typescript: "npm:^5.4.5"
-    use-reducer-devtools: "portal:../use-reducer-devtools"
+    use-reducer-devtools: "npm:^0.1.0"
     vitest: "npm:^1.5.0"
   peerDependencies:
     "@reduxjs/toolkit": ^2.0
