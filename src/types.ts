@@ -1,18 +1,17 @@
-import type { UnknownAction, Selector } from "@reduxjs/toolkit";
+import type { UnknownAction, Selector, ActionCreator } from "@reduxjs/toolkit";
 import type { Reducer } from "react";
 
-type Compute<T> = { [K in keyof T]: T[K] } & unknown;
+export type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
-export type SliceActions = Record<
-  string,
-  (...args: Array<any>) => UnknownAction
->;
+export type NotUndefined = NonNullable<unknown> | null;
+
+export type SliceActions = Record<string, ActionCreator<UnknownAction>>;
 
 export type SliceSelectors<State> = Record<string, Selector<State>>;
 
 export type BoundSelectors<
   State,
-  Selectors extends SliceSelectors<any>,
+  Selectors extends SliceSelectors<State>,
 > = Compute<{
   [K in keyof Selectors]: Selectors[K] extends Selector<
     State,
@@ -36,6 +35,7 @@ export interface Slice<
   Actions extends SliceActions,
   Selectors extends SliceSelectors<State>,
 > {
+  name: string;
   getInitialState: () => State;
   reducer: Reducer<State, UnknownAction>;
   actions: Actions;

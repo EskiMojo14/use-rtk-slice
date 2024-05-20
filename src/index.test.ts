@@ -64,7 +64,7 @@ describe("useSlice", () => {
     const initialState = todoAdapter.getInitialState(undefined, [
       { id: nanoid(), text: "Todo", completed: false },
     ]);
-    const { result } = renderHook(() => useSlice(todoSlice, initialState));
+    const { result } = renderHook(() => useSlice(todoSlice, { initialState }));
 
     const [, , state] = result.current;
 
@@ -74,7 +74,9 @@ describe("useSlice", () => {
   it("can receive initializing actions, which are applied during setup", () => {
     const action = todoAdded("Todo 1");
     const { result } = renderHook(() =>
-      useSlice(todoSlice, undefined, [action]),
+      useSlice(todoSlice, {
+        initialActions: [action],
+      }),
     );
 
     const [, , state] = result.current;
@@ -114,6 +116,7 @@ describe("useSlice", () => {
     const increment = createAction("increment");
     const { result } = renderHook(() =>
       useSlice({
+        name: "counter",
         // these two don't need to be stable
         getInitialState: () => initialState,
         reducer(state, action) {
