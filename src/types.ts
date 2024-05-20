@@ -1,7 +1,7 @@
 import type { UnknownAction, Selector, ActionCreator } from "@reduxjs/toolkit";
 import type { Reducer } from "react";
 
-type Compute<T> = { [K in keyof T]: T[K] } & unknown;
+export type Compute<T> = { [K in keyof T]: T[K] } & unknown;
 
 export type NotUndefined = NonNullable<unknown> | null;
 

@@ -9,6 +9,7 @@ import {
 } from "use-reducer-devtools";
 import type {
   BoundSelectors,
+  Compute,
   NotUndefined,
   Slice,
   SliceActions,
@@ -17,9 +18,9 @@ import type {
 
 export type { SliceBoundSelectors } from "./types";
 
-export const id = <T>(x: T) => x;
+const id = <T>(x: T) => x;
 
-interface UseSliceConfig<State extends NotUndefined> {
+export interface UseSliceConfig<State extends NotUndefined> {
   /**
    * Initial state for the reducer.
    * If not provided, the slice's initial state will be used.
@@ -36,6 +37,18 @@ interface UseSliceConfig<State extends NotUndefined> {
   devTools?: DevtoolsConfig<State, UnknownAction>;
 }
 
+export type UseSliceResult<
+  State extends NotUndefined,
+  Actions extends SliceActions,
+  Selectors extends SliceSelectors<State>,
+> = Compute<
+  [
+    selectors: BoundSelectors<State, Selectors>,
+    dispatch: Dispatch & Actions,
+    state: State,
+  ]
+>;
+
 function makeUseSlice(useReducer: typeof useReducerWithDevtools) {
   return function useSlice<
     State extends NotUndefined,
@@ -44,11 +57,7 @@ function makeUseSlice(useReducer: typeof useReducerWithDevtools) {
   >(
     slice: Slice<State, Actions, Selectors>,
     { initialState, initialActions = [], devTools }: UseSliceConfig<State> = {},
-  ): [
-    selectors: BoundSelectors<State, Selectors>,
-    dispatch: Dispatch & Actions,
-    state: State,
-  ] {
+  ): UseSliceResult<State, Actions, Selectors> {
     const [state, reactDispatch] = useReducer(
       slice.reducer,
       () =>
@@ -100,4 +109,13 @@ export const useSliceWithProdDevtools = makeUseSlice(
   useReducerWithProdDevtools,
 );
 
-export const useSliceWithoutDevtools = makeUseSlice(useReducerWithLazyState);
+export const useSliceWithoutDevtools: <
+  State extends NotUndefined,
+  Actions extends SliceActions,
+  Selectors extends SliceSelectors<State>,
+>(
+  slice: Slice<State, Actions, Selectors>,
+  config?: Omit<UseSliceConfig<State>, "devTools">,
+) => UseSliceResult<State, Actions, Selectors> = makeUseSlice(
+  useReducerWithLazyState,
+);
