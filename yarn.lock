@@ -5964,7 +5964,6 @@ __metadata:
   resolution: "use-rtk-slice@workspace:."
   dependencies:
     "@arethetypeswrong/cli": "npm:^0.15.3"
-    "@redux-devtools/extension": "npm:^3.3.0"
     "@reduxjs/toolkit": "npm:^2.2.3"
     "@testing-library/jest-dom": "npm:^6.4.2"
     "@testing-library/react": "npm:^15.0.4"

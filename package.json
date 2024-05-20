@@ -81,7 +81,6 @@
     "react": ">=16.8.0"
   },
   "dependencies": {
-    "@redux-devtools/extension": "^3.3.0",
     "use-reducer-devtools": "^0.1.0"
   }
 }
